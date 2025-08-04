@@ -79,7 +79,7 @@ descrip_men <- M %>%
 M %>% 
   filter(condi_gender == 0) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                  na.deletion = "pairwise", 
                  corr.method = "pearson", 
                  triangle = "lower")
@@ -95,10 +95,10 @@ descrip_women <- M %>%
 M %>% 
   filter(condi_gender == 1) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
-                   triangle = "lower")
+                   triangle = "upper")
 
 
 #### 3.1.2 Argentina ####
@@ -120,7 +120,7 @@ descrip_men_arg <- M_arg %>%
 M_arg %>% 
   filter(condi_gender == 0) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
                    triangle = "lower")
@@ -136,10 +136,10 @@ descrip_women_arg <- M_arg %>%
 M_arg %>% 
   filter(condi_gender == 1) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
-                   triangle = "lower")
+                   triangle = "upper")
 
 
 #### 3.1.2 Chile ####
@@ -161,7 +161,7 @@ descrip_men_cl <- M_cl %>%
 M_cl %>% 
   filter(condi_gender == 0) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
                    triangle = "lower")
@@ -177,10 +177,10 @@ descrip_women_cl <- M_cl %>%
 M_cl %>% 
   filter(condi_gender == 1) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
-                   triangle = "lower")
+                   triangle = "upper")
 
 
 #### 3.1.3 Colombia ####
@@ -202,7 +202,7 @@ descrip_men_col <- M_col %>%
 M_col %>% 
   filter(condi_gender == 0) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
                    triangle = "lower")
@@ -218,10 +218,10 @@ descrip_women_col <- M_col %>%
 M_col %>% 
   filter(condi_gender == 1) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
-                   triangle = "lower")
+                   triangle = "upper")
 
 #### 3.1.3 Mexico ####
 
@@ -242,7 +242,7 @@ descrip_men_mex <- M_mex %>%
 M_mex %>% 
   filter(condi_gender == 0) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
                    triangle = "lower")
@@ -258,10 +258,10 @@ descrip_women_mex <- M_mex %>%
 M_mex %>% 
   filter(condi_gender == 1) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
-                   triangle = "lower")
+                   triangle = "upper")
 
 #### 3.1.3 Spain ####
 
@@ -282,7 +282,7 @@ descrip_men_spa <- M_spa %>%
 M_spa %>% 
   filter(condi_gender == 0) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
                    triangle = "lower")
@@ -298,10 +298,10 @@ descrip_women_spa <- M_spa %>%
 M_spa %>% 
   filter(condi_gender == 1) %>% 
   select(-condi_gender) %>% 
-  sjPlot::tab_corr(., 
+  sjPlot::tab_corr(., digits = 2,
                    na.deletion = "pairwise", 
                    corr.method = "pearson", 
-                   triangle = "lower")
+                   triangle = "upper")
 
 
 #### 3.2 Reliability ####
@@ -434,6 +434,62 @@ fit_cfa_women <- lavaan::cfa(model_cfa,
 
 summary(fit_cfa_man, fit.measures = TRUE, standardized = TRUE, rsquare = TRUE)
 summary(fit_cfa_women, fit.measures = TRUE, standardized = TRUE, rsquare = TRUE)
+
+
+## By country ##
+
+paises <- c("Argentina", "Chile", "Colombia", "Mexico", "Spain")
+
+# man
+run_cfa_country_man <- function(pais) {
+  message("\n##### CFA ", pais, " #####")
+  
+  
+  fit_cfa_man <- lavaan::cfa(model_cfa, 
+                             data = subset(df_study3, condi_gender == 0), 
+                             estimator = "MLR")
+  
+  print(summary(fit_cfa_man, fit.measures = TRUE, standardized = TRUE, rsquare = TRUE))
+  
+  fit_meas <- fitmeasures(fit_cfa_man, c("chisq", "pvalue", "df", "cfi", "tli", 
+                                         "rmsea", "rmsea.ci.lower", "rmsea.ci.upper", "srmr"))
+  
+  return(list(
+    country = pais,
+    fit = fit_cfa_man,
+    fit_meas = fit_meas
+  ))
+}
+
+resultados_cfa_man <- map(paises, run_cfa_country_man)
+
+names(resultados_cfa_man) <- paises
+
+# women
+run_cfa_country_women <- function(pais) {
+  message("\n##### CFA ", pais, " #####")
+  
+  
+  fit_cfa_man <- lavaan::cfa(model_cfa, 
+                             data = subset(df_study3, condi_gender == 1), 
+                             estimator = "MLR")
+  
+  print(summary(fit_cfa_man, fit.measures = TRUE, standardized = TRUE, rsquare = TRUE))
+  
+  fit_meas <- fitmeasures(fit_cfa_man, c("chisq", "pvalue", "df", "cfi", "tli", 
+                                         "rmsea", "rmsea.ci.lower", "rmsea.ci.upper", "srmr"))
+  
+  return(list(
+    country = pais,
+    fit = fit_cfa_man,
+    fit_meas = fit_meas
+  ))
+}
+
+resultados_cfa_women <- map(paises, run_cfa_country_women)
+
+names(resultados_cfa_women) <- paises
+
 
 # SEM models ----
 
@@ -657,6 +713,7 @@ names(resultados_sem_women) <- paises
 
 save(df_study3,
      fit_cfa_man,fit_cfa_women,
+     resultados_cfa_man, resultados_cfa_women,
      fit_sem_man,fit_sem_women,
      est_man, effects_total_man,
      est_women, effects_total_women,
